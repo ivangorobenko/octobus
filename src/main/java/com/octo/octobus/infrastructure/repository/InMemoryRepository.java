@@ -14,7 +14,7 @@ public class InMemoryRepository<T> {
         this.data.put(key, value);
     }
 
-    public T get(T key) {
+    public T get(String key) {
         return this.data.get(key);
     }
 }

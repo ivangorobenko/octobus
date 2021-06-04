@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
@@ -13,7 +14,7 @@ class OctobusApplicationTests {
     @Test
     @DisplayName("Doit renvoyer un id de billet quand il est créé")
     void shouldReturnAnIdForACreatedTicket() {
-        CreateTicketCommandHandler sut = new CreateTicketCommandHandler();
+        CreateTicketCommandHandler sut = new CreateTicketCommandHandler(new InMemoryRepository<Ticket>());
         long journeyTimestamp = System.currentTimeMillis();
         int trainId = 1234;
 
@@ -25,19 +26,32 @@ class OctobusApplicationTests {
     @Test
     @DisplayName("Doit créer un billet quand on reçoit la commande de création du billet")
     void shouldCreateATicket() {
-        InMemoryRepository ticketRepository = new InMemoryRepository<Ticket>();
-        CreateTicketCommandHandler sut = new CreateTicketCommandHandler();
+        InMemoryRepository<Ticket> ticketRepository = new InMemoryRepository<>();
+        CreateTicketCommandHandler sut = new CreateTicketCommandHandler(ticketRepository);
         long journeyTimestamp = System.currentTimeMillis();
         int trainId = 1234;
 
         CommandResponse response = sut.handle(new CreateTicketCommand(new Journey(trainId, journeyTimestamp)));
 
-        assertNotNull(response.getId());
+        String responseId = response.getId();
+        Ticket ticket = ticketRepository.get(responseId);
+        assertNotNull(ticket);
+        assertEquals(responseId, ticket.id);
     }
 
     private class CreateTicketCommandHandler {
+        private InMemoryRepository ticketRepository;
+
+        public CreateTicketCommandHandler(InMemoryRepository ticketRepository) {
+
+            this.ticketRepository = ticketRepository;
+        }
+
         public CommandResponse handle(CreateTicketCommand createTicketCommand) {
-            return new CommandResponse("0");
+            Ticket ticket = new Ticket();
+            String ticketId = ticket.getId();
+            this.ticketRepository.save(ticketId, ticket);
+            return new CommandResponse(ticketId);
         }
     }
 
@@ -86,7 +100,7 @@ class OctobusApplicationTests {
     public class Ticket {
         private final String id;
 
-        public Ticket(){
+        public Ticket() {
             this.id = "0";
         }
 
