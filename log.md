@@ -3,5 +3,7 @@
 1. Création de InMemoryRepository
 1. Création des objets Ticket et Journey 
 
-Idées prochaines fois : 
- Transformer Ticket en Agrégat (porter sa propre création et éventuellement des invariants)
+##Vendredi 11/06 :
+1. Passage à Kotlin 
+1. Introduction de l'agregat Bus
+1. Introduction des repository spécifiques pour le Bus et le Coupon
