@@ -8,7 +8,7 @@ class InMemoryBusRepository(private var bus: Bus = Bus(10)) : Repository<Bus> {
         return bus
     }
 
-    override fun save(bus: Bus) {
-        this.bus = bus
+    override fun save(value: Bus) {
+        this.bus = value
     }
 }
